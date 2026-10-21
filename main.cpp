@@ -7,133 +7,180 @@
 #define str 50
 #define max 999
 
-//Estructura
-
+// Estructura
 typedef struct {
-    char modelo[str]; //modelo del auto
-    char categoria; //sedan, deportivo o camioneta
-    int anio; //año de fabricacion
-    float precio; //precio del auto
-    bool esCero; //si es 0km o no
+    char modelo[str];
+    char categoria;
+    int anio;
+    float precio;
+    bool esCero;
 } Vehiculo;
 
-//Carga de datos
+// Pausa minimalista
+void esperarCeroParaVolver() {
+    int volver;
+    do {
+        printf("\n  [0] Volver al menu > ");
+        if (scanf("%d", &volver) != 1) {
+            volver = -1;
+        }
+        while (getchar() != '\n');
+    } while (volver != 0);
+}
 
+// Encabezado y fila de tabla para reutilizar y mantener el estilo limpio
+void imprimirEncabezadoTabla() {
+    printf("  +----+----------------------+-----+------+-------------+-----+\n");
+    printf("  | #  | MODELO               | CAT | ANIO | PRECIO      | 0KM |\n");
+    printf("  +----+----------------------+-----+------+-------------+-----+\n");
+}
+
+void imprimirFilaVehiculo(Vehiculo v, int indice) {
+    printf("  | %-2d | %-20.20s |  %c  | %-4d | $%-10.2f | %-3s |\n",
+           indice,
+           v.modelo,
+           v.categoria,
+           v.anio,
+           v.precio,
+           v.esCero ? "Si" : "No");
+}
+
+void imprimirPieTabla() {
+    printf("  +----+----------------------+-----+------+-------------+-----+\n");
+}
+
+// Carga de datos
 int cargarVehiculos(Vehiculo lista[], int cantidad) {
     char continuar;
-    FILE *archivo;
-    archivo = fopen("autos.txt", "a");
+    FILE *archivo = fopen("autos.txt", "a");
 
     if (archivo == NULL) {
-        printf("Error al abrir el archivo.\n");
+        printf("\n  [!] Error al abrir el archivo.\n");
+        return cantidad;
     }
 
     do {
-        printf("\n--- CARGA DE VEHICULO #%d ---\n", cantidad + 1);
+        if (cantidad >= max) {
+            printf("\n  [!] Se alcanzo el limite maximo de vehiculos.\n");
+            break;
+        }
 
-        printf("Ingrese modelo: ");
+        printf("\n  +----------------------------------------+\n");
+        printf("  | NUEVO VEHICULO #%-22d |\n", cantidad + 1);
+        printf("  +----------------------------------------+\n");
+
+        printf("  > Modelo: ");
         scanf(" %[^\n]", lista[cantidad].modelo);
         while (getchar() != '\n');
 
-        printf("Ingrese categoria\nS(Sedan)\nD(Deportivo)\nC(Camioneta)\n ");
+        printf("  > Categoria [S]edan [D]eportivo [C]amioneta: ");
         scanf(" %c", &lista[cantidad].categoria);
         while (getchar() != '\n');
+        lista[cantidad].categoria = toupper(lista[cantidad].categoria);
 
-        printf("Ingrese año: ");
+        printf("  > Anio: ");
         scanf("%d", &lista[cantidad].anio);
         while (getchar() != '\n');
 
-        printf("Ingrese precio: ");
+        printf("  > Precio: $");
         scanf("%f", &lista[cantidad].precio);
         while (getchar() != '\n');
 
         int auxBool;
-        printf("Es 0km? (1 = Si, 0 = No): ");
+        printf("  > Es 0km? [1] Si / [0] No: ");
         scanf("%d", &auxBool);
         while (getchar() != '\n');
 
         lista[cantidad].esCero = (auxBool == 1);
-        cantidad++; // suma un auto a la lista
 
-        printf("\nVehiculo guardado correctamente! Desea ingresar otro? (s/n): ");
+        fprintf(archivo, "%s|%c|%d|%.2f|%d\n",
+                lista[cantidad].modelo,
+                lista[cantidad].categoria,
+                lista[cantidad].anio,
+                lista[cantidad].precio,
+                lista[cantidad].esCero ? 1 : 0);
+
+        cantidad++;
+
+        printf("\n  [OK] Guardado. Cargar otro? (s/n) > ");
         scanf(" %c", &continuar);
         while (getchar() != '\n');
-
     } while (continuar == 's' || continuar == 'S');
 
+    fclose(archivo);
     return cantidad;
 }
 
-// mostrar los datos
+// Mostrar todos los datos
 void mostrarVehiculos(Vehiculo lista[], int cantidad) {
-    printf("\n================ VEHICULOS CARGADOS ================\n");
+    printf("\n  :: LISTADO DE VEHICULOS ::\n\n");
 
-    for (int i = 0; i < cantidad; i++) {
-        printf("\n--- Vehiculo #%d ---\n", i + 1);
-        printf("Modelo:    %s\n", lista[i].modelo);
-        printf("Categoria: %c\n", lista[i].categoria);
-        printf("Año:      %d\n", lista[i].anio);
-        printf("Precio:    $%.2f\n", lista[i].precio);
-        printf("Es 0km?:   %s\n", lista[i].esCero ? "Si" : "No");
+    if (cantidad == 0) {
+        printf("  [!] No hay vehiculos cargados en memoria.\n");
+        return;
     }
 
-    printf("\n=============================================================\n");
+    imprimirEncabezadoTabla();
+    for (int i = 0; i < cantidad; i++) {
+        imprimirFilaVehiculo(lista[i], i + 1);
+    }
+    imprimirPieTabla();
 }
 
+// Mostrar solo 0km
 void mostrar0km(Vehiculo lista[], int cantidad) {
-    int aux=0;
+    int aux = 0;
+    printf("\n  :: VEHICULOS 0KM ::\n\n");
+
     for (int i = 0; i < cantidad; i++) {
         if (lista[i].esCero) {
-            printf("\n================ VEHICULOS 0KM ================\n");
-            printf("\n--- Vehiculo #%d ---\n", i + 1);
-            printf("Modelo:    %s\n", lista[i].modelo);
-            printf("Categoria: %c\n", lista[i].categoria);
-            printf("Año:      %d\n", lista[i].anio);
-            printf("Precio:    $%.2f\n", lista[i].precio);
-            printf("Es 0km?:   %s\n", lista[i].esCero ? "Si" : "No");
+            if (aux == 0) imprimirEncabezadoTabla();
+            imprimirFilaVehiculo(lista[i], i + 1);
             aux++;
         }
     }
+
     if (aux == 0) {
-        printf("No hay vehiculos 0km.\n");
+        printf("  [!] No hay vehiculos 0km registrados.\n");
+    } else {
+        imprimirPieTabla();
     }
-    printf("\n=============================================================\n");
 }
 
+// Mostrar por categoria
 void mostrarPorCategoria(Vehiculo lista[], int cantidad) {
     char categoria;
-    int aux=0;
+    int aux = 0;
 
-    printf("\n================ CATEGORIA ================\n");
-    printf("S. Sedan\n");
-    printf("D. Deportivo\n");
-    printf("C. Camioneta\n");
-    printf("Ingrese categoria:");
-    scanf("%c", &categoria);
+    printf("\n  :: FILTRAR POR CATEGORIA ::\n");
+    printf("  [S] Sedan  |  [D] Deportivo  |  [C] Camioneta\n");
+    printf("  > Seleccione: ");
+    scanf(" %c", &categoria);
     while (getchar() != '\n');
 
     categoria = toupper(categoria);
     if (categoria != 'S' && categoria != 'D' && categoria != 'C') {
-        printf("Categoria invalida\n");
-    }else {
-        for (int i = 0; i < cantidad; i++) {
-            if (lista[i].categoria == categoria) {
-                printf("\n--- Vehiculo #%d ---\n", i + 1);
-                printf("Modelo:    %s\n", lista[i].modelo);
-                printf("Categoria: %c\n", lista[i].categoria);
-                printf("Año:      %d\n", lista[i].anio);
-                printf("Precio:    $%.2f\n", lista[i].precio);
-                printf("Es 0km?:   %s\n", lista[i].esCero ? "Si" : "No");
-                aux++;
-            }
-        }
-        if (aux == 0) {
-            printf("No hay vehiculos de esa categoria\n");
+        printf("\n  [!] Categoria invalida.\n");
+        return;
+    }
+
+    printf("\n");
+    for (int i = 0; i < cantidad; i++) {
+        if (toupper(lista[i].categoria) == categoria) {
+            if (aux == 0) imprimirEncabezadoTabla();
+            imprimirFilaVehiculo(lista[i], i + 1);
+            aux++;
         }
     }
-    printf("\n=============================================================\n");
+
+    if (aux == 0) {
+        printf("  [!] No hay vehiculos en la categoria '%c'.\n", categoria);
+    } else {
+        imprimirPieTabla();
+    }
 }
 
+// Dividir archivo
 void dividirArchivo() {
     FILE *origen, *ceroKm, *usados;
     Vehiculo vehiculo;
@@ -141,24 +188,22 @@ void dividirArchivo() {
 
     origen = fopen("autos.txt", "r");
 
-    if(origen == NULL) {
-        printf("Error al abrir autos.txt\n");
+    if (origen == NULL) {
+        printf("\n  [!] Error al abrir 'autos.txt' (Cargue algun auto primero).\n");
         return;
     }
-    ceroKm = fopen("autos.txt", "w");
+
+    ceroKm = fopen("cerokm.txt", "w");
     usados = fopen("usados.txt", "w");
 
     if (ceroKm == NULL || usados == NULL) {
-        printf("Error al abrir archivos\n");
-        if (ceroKm != NULL) {
-            fclose(ceroKm);
-        }
-        if (usados != NULL) {
-            fclose(usados);
-        }
+        printf("\n  [!] Error al crear los archivos de destino.\n");
+        if (ceroKm != NULL) fclose(ceroKm);
+        if (usados != NULL) fclose(usados);
         fclose(origen);
         return;
     }
+
     while (fscanf(origen, "%49[^|]|%c|%d|%f|%d\n",
                   vehiculo.modelo,
                   &vehiculo.categoria,
@@ -169,10 +214,10 @@ void dividirArchivo() {
 
         if (vehiculo.esCero) {
             fprintf(ceroKm, "%s|%c|%d|%.2f|1\n",
-                   vehiculo.modelo,
-                   vehiculo.categoria,
-                   vehiculo.anio,
-                   vehiculo.precio);
+                    vehiculo.modelo,
+                    vehiculo.categoria,
+                    vehiculo.anio,
+                    vehiculo.precio);
         } else {
             fprintf(usados, "%s|%c|%d|%.2f|0\n",
                     vehiculo.modelo,
@@ -186,7 +231,7 @@ void dividirArchivo() {
     fclose(ceroKm);
     fclose(usados);
 
-    printf("Archivos separados correctamente.\n");
+    printf("\n  [OK] Archivos Divididos: 'cerokm.txt' y 'usados.txt'.\n");
 }
 
 int main() {
@@ -195,52 +240,48 @@ int main() {
     int opcion;
 
     do {
-        printf("\n================ MENU PRINCIPAL ================\n");
-        printf("1. Cargar datos\n");
-        printf("2. Mostrar datos\n");
-        printf("3. Mostrar unicamente autos 0km\n");
-        printf("4. Mostrar autos por categoria\n");
-        printf("5. Dividir archivos de autos\n");
+        printf("\n  +----------------------------------------+\n");
+        printf("  |          GESTION DE VEHICULOS          |\n");
+        printf("  +----------------------------------------+\n");
+        printf("  |  [1] Cargar vehiculo                   |\n");
+        printf("  |  [2] Ver todos los vehiculos           |\n");
+        printf("  |  [3] Ver exclusivamente 0km            |\n");
+        printf("  |  [4] Filtrar por categoria             |\n");
+        printf("  |  [5] Dividir archivos (0km / Usados)  |\n");
+        printf("  |                                        |\n");
+        printf("  |  [0] Salir                             |\n");
+        printf("  +----------------------------------------+\n");
+        printf("  > Opcion: ");
 
-        // espacio para agregar otras opciones...
-
-        printf("0. Salir del programa\n");
-        printf("================================================\n");
-        printf("Seleccione una opcion: ");
-        scanf("%d", &opcion);
+        if (scanf("%d", &opcion) != 1) {
+            opcion = -1; // Evita errores si ingresan una letra en el menu
+        }
         while (getchar() != '\n');
 
         switch (opcion) {
             case 1:
-                cantidad = cargarVehiculos(lista, cantidad); // carga de datos
+                cantidad = cargarVehiculos(lista, cantidad);
                 break;
-
             case 2:
-                mostrarVehiculos(lista, cantidad); // mostrar los datos
+                mostrarVehiculos(lista, cantidad);
+                esperarCeroParaVolver();
                 break;
-
             case 3:
                 mostrar0km(lista, cantidad);
+                esperarCeroParaVolver();
                 break;
-
             case 4:
                 mostrarPorCategoria(lista, cantidad);
+                esperarCeroParaVolver();
                 break;
-
             case 5:
                 dividirArchivo();
                 break;
-
-
-                // espacio para agregar otras opciones..
-                // ejemplo case 3: ... break;
-
             case 0:
-                printf("\nSaliendo del programa...\n");
+                printf("\n  Saliendo del programa...\n");
                 break;
-
             default:
-                printf("\n[!] Opcion invalida. Intente nuevamente.\n");
+                printf("\n  [!] Opcion invalida.\n");
                 break;
         }
 
@@ -248,4 +289,3 @@ int main() {
 
     return 0;
 }
-
