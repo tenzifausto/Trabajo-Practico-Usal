@@ -16,7 +16,6 @@ typedef struct {
     bool esCero;
 } Vehiculo;
 
-// Pausa minimalista
 void esperarCeroParaVolver() {
     int volver;
     do {
@@ -28,7 +27,6 @@ void esperarCeroParaVolver() {
     } while (volver != 0);
 }
 
-// Encabezado y fila de tabla para reutilizar y mantener el estilo limpio
 void imprimirEncabezadoTabla() {
     printf("  +----+----------------------+-----+------+-------------+-----+\n");
     printf("  | #  | MODELO               | CAT | ANIO | PRECIO      | 0KM |\n");
@@ -106,7 +104,7 @@ int cargarVehiculos(Vehiculo lista[], int cantidad) {
         scanf(" %c", &continuar);
         while (getchar() != '\n');
     } while (continuar == 's' || continuar == 'S');
-
+    
     fclose(archivo);
     return cantidad;
 }
@@ -180,7 +178,7 @@ void mostrarPorCategoria(Vehiculo lista[], int cantidad) {
     }
 }
 
-// Dividir archivo
+// Dividir usado/cero
 void dividirArchivo() {
     FILE *origen, *ceroKm, *usados;
     Vehiculo vehiculo;
