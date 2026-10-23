@@ -245,14 +245,14 @@ int main() {
         printf("  |  [2] Ver todos los vehiculos           |\n");
         printf("  |  [3] Ver exclusivamente 0km            |\n");
         printf("  |  [4] Filtrar por categoria             |\n");
-        printf("  |  [5] Dividir archivos (0km / Usados)  |\n");
+        printf("  |  [5] Dividir archivos (0km / Usados)   |\n");
         printf("  |                                        |\n");
         printf("  |  [0] Salir                             |\n");
         printf("  +----------------------------------------+\n");
         printf("  > Opcion: ");
 
         if (scanf("%d", &opcion) != 1) {
-            opcion = -1; // Evita errores si ingresan una letra en el menu
+            opcion = -1;
         }
         while (getchar() != '\n');
 
