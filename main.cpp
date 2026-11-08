@@ -16,6 +16,7 @@ typedef struct {
     bool esCero;
 } Vehiculo;
 
+// Pausa minimalista
 void esperarCeroParaVolver() {
     int volver;
     do {
@@ -27,6 +28,7 @@ void esperarCeroParaVolver() {
     } while (volver != 0);
 }
 
+// Encabezado y fila de tabla para reutilizar y mantener el estilo limpio
 void imprimirEncabezadoTabla() {
     printf("  +----+----------------------+-----+------+-------------+-----+\n");
     printf("  | #  | MODELO               | CAT | ANIO | PRECIO      | 0KM |\n");
@@ -68,26 +70,47 @@ int cargarVehiculos(Vehiculo lista[], int cantidad) {
         printf("  +----------------------------------------+\n");
 
         printf("  > Modelo: ");
-        scanf(" %[^\n]", lista[cantidad].modelo);
+        scanf(" %49[^\n]", lista[cantidad].modelo);
         while (getchar() != '\n');
 
         printf("  > Categoria [S]edan [D]eportivo [C]amioneta: ");
         scanf(" %c", &lista[cantidad].categoria);
         while (getchar() != '\n');
         lista[cantidad].categoria = toupper(lista[cantidad].categoria);
+        while(lista[cantidad].categoria != 'S' && lista[cantidad].categoria != 'D' && lista[cantidad].categoria != 'C'){
+            printf("  > Categoria invalida. Ingrese [S]edan [D]eportivo [C]amioneta: ");
+            scanf(" %c", &lista[cantidad].categoria);
+            while (getchar() != '\n');
+            lista[cantidad].categoria = toupper(lista[cantidad].categoria);
+        }
 
         printf("  > Anio: ");
         scanf("%d", &lista[cantidad].anio);
         while (getchar() != '\n');
+        while(lista[cantidad].anio < 1886 || lista[cantidad].anio > 2050){
+            printf("  > Anio incorrecto. Ingrese Anio: ");
+            scanf("%d", &lista[cantidad].anio);
+            while (getchar() != '\n');
+        }
 
         printf("  > Precio: $");
         scanf("%f", &lista[cantidad].precio);
         while (getchar() != '\n');
+        while(lista[cantidad].precio <= 0){
+            printf("  > Precio incorrecto. Ingrese Precio: $");
+            scanf("%f", &lista[cantidad].precio);
+            while (getchar() != '\n');
+        }
 
         int auxBool;
         printf("  > Es 0km? [1] Si / [0] No: ");
         scanf("%d", &auxBool);
         while (getchar() != '\n');
+        while(auxBool != 1 && auxBool != 0){
+            printf("  > Opcion Incorrecta. Es 0km? [1] Si / [0] No: ");
+            scanf("%d", &auxBool);
+            while (getchar() != '\n');
+        }
 
         lista[cantidad].esCero = (auxBool == 1);
 
@@ -103,8 +126,15 @@ int cargarVehiculos(Vehiculo lista[], int cantidad) {
         printf("\n  [OK] Guardado. Cargar otro? (s/n) > ");
         scanf(" %c", &continuar);
         while (getchar() != '\n');
-    } while (continuar == 's' || continuar == 'S');
-    
+        continuar = toupper(continuar);
+        while(continuar != 'S' && continuar != 'N'){
+            printf("\n  [OK] Guardado. Opcion incorrecta, Cargar otro? (s/n) > ");
+            scanf(" %c", &continuar);
+            while (getchar() != '\n');
+            continuar = toupper(continuar);
+        }
+    } while (continuar == 'S');
+
     fclose(archivo);
     return cantidad;
 }
@@ -178,7 +208,7 @@ void mostrarPorCategoria(Vehiculo lista[], int cantidad) {
     }
 }
 
-// Dividir usado/cero
+// Dividir archivo
 void dividirArchivo() {
     FILE *origen, *ceroKm, *usados;
     Vehiculo vehiculo;
@@ -245,14 +275,14 @@ int main() {
         printf("  |  [2] Ver todos los vehiculos           |\n");
         printf("  |  [3] Ver exclusivamente 0km            |\n");
         printf("  |  [4] Filtrar por categoria             |\n");
-        printf("  |  [5] Dividir archivos (0km / Usados)   |\n");
+        printf("  |  [5] Dividir archivos (0km / Usados)  |\n");
         printf("  |                                        |\n");
         printf("  |  [0] Salir                             |\n");
         printf("  +----------------------------------------+\n");
         printf("  > Opcion: ");
 
         if (scanf("%d", &opcion) != 1) {
-            opcion = -1;
+            opcion = -1; // Evita errores si ingresan una letra en el menu
         }
         while (getchar() != '\n');
 
