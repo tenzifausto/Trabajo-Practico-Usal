@@ -142,14 +142,15 @@ int cargarVehiculos(Vehiculo lista[], int cantidad) {
 // Mostrar todos los datos
 void mostrarVehiculos(Vehiculo lista[], int cantidad) {
     printf("\n  :: LISTADO DE VEHICULOS ::\n\n");
-
+    int i;
+    
     if (cantidad == 0) {
         printf("  [!] No hay vehiculos cargados en memoria.\n");
         return;
     }
 
     imprimirEncabezadoTabla();
-    for (int i = 0; i < cantidad; i++) {
+    for (i = 0; i < cantidad; i++) {
         imprimirFilaVehiculo(lista[i], i + 1);
     }
     imprimirPieTabla();
@@ -158,9 +159,10 @@ void mostrarVehiculos(Vehiculo lista[], int cantidad) {
 // Mostrar solo 0km
 void mostrar0km(Vehiculo lista[], int cantidad) {
     int aux = 0;
+    int i;
     printf("\n  :: VEHICULOS 0KM ::\n\n");
 
-    for (int i = 0; i < cantidad; i++) {
+    for (i = 0; i < cantidad; i++) {
         if (lista[i].esCero) {
             if (aux == 0) imprimirEncabezadoTabla();
             imprimirFilaVehiculo(lista[i], i + 1);
@@ -179,21 +181,24 @@ void mostrar0km(Vehiculo lista[], int cantidad) {
 void mostrarPorCategoria(Vehiculo lista[], int cantidad) {
     char categoria;
     int aux = 0;
+    int i;
 
     printf("\n  :: FILTRAR POR CATEGORIA ::\n");
     printf("  [S] Sedan  |  [D] Deportivo  |  [C] Camioneta\n");
     printf("  > Seleccione: ");
     scanf(" %c", &categoria);
     while (getchar() != '\n');
-
     categoria = toupper(categoria);
-    if (categoria != 'S' && categoria != 'D' && categoria != 'C') {
-        printf("\n  [!] Categoria invalida.\n");
-        return;
-    }
+    
+	while(categoria != 'S' && categoria != 'D' && categoria != 'C'){
+            printf("  > Categoria invalida. Ingrese [S]edan [D]eportivo [C]amioneta: ");
+            scanf(" %c", &categoria);
+            while (getchar() != '\n');
+    		categoria = toupper(categoria);
+    	}
 
     printf("\n");
-    for (int i = 0; i < cantidad; i++) {
+    for (i = 0; i < cantidad; i++) {
         if (toupper(lista[i].categoria) == categoria) {
             if (aux == 0) imprimirEncabezadoTabla();
             imprimirFilaVehiculo(lista[i], i + 1);
@@ -262,10 +267,39 @@ void dividirArchivo() {
     printf("\n  [OK] Archivos Divididos: 'cerokm.txt' y 'usados.txt'.\n");
 }
 
+//lee el archivo autos.txt al iniciar el programa. Recupero los registros anteriores y los almaceno nuevamente en el arreglo para poder trabajar con ellos.
+int cargarDesdeArchivo(Vehiculo lista[], int cantidad) {
+    FILE *archivo = fopen("autos.txt", "r");
+
+    if (archivo == NULL) {
+        return cantidad;
+    }
+
+    int valorBool;
+
+    while (cantidad < max &&
+           fscanf(archivo, " %49[^|]|%c|%d|%f|%d",
+                  lista[cantidad].modelo,
+                  &lista[cantidad].categoria,
+                  &lista[cantidad].anio,
+                  &lista[cantidad].precio,
+                  &valorBool) == 5) {
+
+        lista[cantidad].esCero = (valorBool == 1);
+        cantidad++;
+    }
+
+    fclose(archivo);
+
+    return cantidad;
+}
+
 int main() {
     Vehiculo lista[max];
     int cantidad = 0;
     int opcion;
+    
+    cantidad = cargarDesdeArchivo(lista, cantidad);
 
     do {
         printf("\n  +----------------------------------------+\n");
