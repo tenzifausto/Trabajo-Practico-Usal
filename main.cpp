@@ -155,7 +155,6 @@ void mostrarVehiculos(Vehiculo lista[], int cantidad) {
         printf("  [!] No hay vehiculos cargados en memoria.\n");
     } else {
     	imprimirEncabezadoTabla();
-	}
 
     for (i = 0; i < cantidad; i++) {
         imprimirFilaVehiculo(lista[i], i + 1);
@@ -279,7 +278,7 @@ int cargarDesdeArchivo(Vehiculo lista[], int cantidad) {
     FILE *archivo = fopen("autos.txt", "r");
 
     if (archivo == NULL) {
-    	printf("\n  [!] Error al abrir 'autos.txt' (Cargue algun auto primero).\n");
+    	printf("\n  [!] No hay registros anteriores para cargar.\n");
         return cantidad;
     }
 
