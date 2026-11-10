@@ -133,12 +133,13 @@ int cargarVehiculos(Vehiculo lista[], int cantidad) {
             scanf(" %c", &continuar);
             while (getchar() != '\n');
             continuar = toupper(continuar);
-    		}
-        while(continuar != 'S' && continuar != 'N'){
+            
+            while(continuar != 'S' && continuar != 'N'){
             printf("\n  [OK] Guardado. Opcion incorrecta, Cargar otro? (s/n) > ");
             scanf(" %c", &continuar);
             while (getchar() != '\n');
             continuar = toupper(continuar);
+    		}        
         }
     } while (continuar == 'S' && cantidad < max);
 
@@ -160,8 +161,8 @@ void mostrarVehiculos(Vehiculo lista[], int cantidad) {
         imprimirFilaVehiculo(lista[i], i + 1);
     }
     imprimirPieTabla();
+	}
 }
-
 // Mostrar solo 0km
 void mostrar0km(Vehiculo lista[], int cantidad) {
     int aux = 0;
