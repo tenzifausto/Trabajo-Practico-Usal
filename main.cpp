@@ -16,6 +16,7 @@ typedef struct {
     bool esCero;
 } Vehiculo;
 
+// Pausa minimalista
 void esperarCeroParaVolver() {
     int volver;
     do {
@@ -27,6 +28,7 @@ void esperarCeroParaVolver() {
     } while (volver != 0);
 }
 
+// Encabezado y fila de tabla para reutilizar y mantener el estilo limpio
 void imprimirEncabezadoTabla() {
     printf("  +----+----------------------+-----+------+-------------+-----+\n");
     printf("  | #  | MODELO               | CAT | ANIO | PRECIO      | 0KM |\n");
@@ -56,13 +58,14 @@ int cargarVehiculos(Vehiculo lista[], int cantidad) {
         printf("\n  [!] Error al abrir el archivo.\n");
         return cantidad;
     }
+    
+    if (cantidad >= max) {
+    printf("\n  [!] Se alcanzo el limite maximo de vehiculos.\n");
+    fclose(archivo);
+    return cantidad;
+	}
 
     do {
-        if (cantidad >= max) {
-            printf("\n  [!] Se alcanzo el limite maximo de vehiculos.\n");
-            break;
-        }
-
         printf("\n  +----------------------------------------+\n");
         printf("  | NUEVO VEHICULO #%-22d |\n", cantidad + 1);
         printf("  +----------------------------------------+\n");
@@ -120,18 +123,24 @@ int cargarVehiculos(Vehiculo lista[], int cantidad) {
                 lista[cantidad].esCero ? 1 : 0);
 
         cantidad++;
-
-        printf("\n  [OK] Guardado. Cargar otro? (s/n) > ");
-        scanf(" %c", &continuar);
-        while (getchar() != '\n');
-        continuar = toupper(continuar);
+		
+		
+        if (cantidad >= max) {
+            printf("\n  [!] Se alcanzo el limite maximo de vehiculos.\n");
+            continuar = 'N';
+        } else {
+            printf("\n  [OK] Guardado. Cargar otro? (s/n) > ");
+            scanf(" %c", &continuar);
+            while (getchar() != '\n');
+            continuar = toupper(continuar);
+    		}
         while(continuar != 'S' && continuar != 'N'){
             printf("\n  [OK] Guardado. Opcion incorrecta, Cargar otro? (s/n) > ");
             scanf(" %c", &continuar);
             while (getchar() != '\n');
             continuar = toupper(continuar);
         }
-    } while (continuar == 'S');
+    } while (continuar == 'S' && cantidad < max);
 
     fclose(archivo);
     return cantidad;
@@ -144,10 +153,10 @@ void mostrarVehiculos(Vehiculo lista[], int cantidad) {
     
     if (cantidad == 0) {
         printf("  [!] No hay vehiculos cargados en memoria.\n");
-        return;
-    }
+    } else {
+    	imprimirEncabezadoTabla();
+	}
 
-    imprimirEncabezadoTabla();
     for (i = 0; i < cantidad; i++) {
         imprimirFilaVehiculo(lista[i], i + 1);
     }
@@ -270,6 +279,7 @@ int cargarDesdeArchivo(Vehiculo lista[], int cantidad) {
     FILE *archivo = fopen("autos.txt", "r");
 
     if (archivo == NULL) {
+    	printf("\n  [!] Error al abrir 'autos.txt' (Cargue algun auto primero).\n");
         return cantidad;
     }
 
@@ -314,7 +324,7 @@ int main() {
         printf("  > Opcion: ");
 
         if (scanf("%d", &opcion) != 1) {
-            opcion = -1;
+            opcion = -1; // Evita errores si ingresan una letra en el menu
         }
         while (getchar() != '\n');
 
