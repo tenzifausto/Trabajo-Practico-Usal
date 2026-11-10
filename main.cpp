@@ -16,7 +16,6 @@ typedef struct {
     bool esCero;
 } Vehiculo;
 
-// Pausa minimalista
 void esperarCeroParaVolver() {
     int volver;
     do {
@@ -28,7 +27,6 @@ void esperarCeroParaVolver() {
     } while (volver != 0);
 }
 
-// Encabezado y fila de tabla para reutilizar y mantener el estilo limpio
 void imprimirEncabezadoTabla() {
     printf("  +----+----------------------+-----+------+-------------+-----+\n");
     printf("  | #  | MODELO               | CAT | ANIO | PRECIO      | 0KM |\n");
@@ -316,7 +314,7 @@ int main() {
         printf("  > Opcion: ");
 
         if (scanf("%d", &opcion) != 1) {
-            opcion = -1; // Evita errores si ingresan una letra en el menu
+            opcion = -1;
         }
         while (getchar() != '\n');
 
